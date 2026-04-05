@@ -1,6 +1,3 @@
-
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container py-5">
     <div class="col-md-10 col-lg-8 mx-auto">
