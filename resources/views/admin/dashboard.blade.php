@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto p-6">
     <h1 class="text-2xl font-bold">Admin Dashboard</h1>
-    <h2 class="text=2xl font-bold mb-6">Top 3 matches:</h2>
+    <h2 class="text=2xl font-bold mb-6">Top 3 Matches:</h2>
 
     @foreach($projects as $project)
         <div class="mb-6 p-4 border rounded shadow">

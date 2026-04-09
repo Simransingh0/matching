@@ -20,7 +20,11 @@
 <!-- Header / Title -->
 <div class="text-center mb-5">
     <h1 class="display-4 fw-bold text-primary mb-2">Projecten Dashboard</h1>
-    <p class="text-muted fs-5">Bekijk, beheer en match projecten met developers</p>
+    @if(auth()->user()?->role === 'Admin')
+        <p class="text-muted fs-5">Bekijk, beheer en match projecten met developers</p>
+    @else
+        <p class="text-muted fs-5">Bekijk en meld je aan bij een van de volgende projecten</p>
+    @endif
     <hr class="w-25 mx-auto border-2 border-primary rounded">
 </div>
 

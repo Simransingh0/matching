@@ -27,6 +27,7 @@
                         <th>Gebruiker</th>
                         <th>Project</th>
                         <th>Aangemeld op</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
 
@@ -36,6 +37,22 @@
                             <td class="fw-bold">{{ $application->user->name }}</td>
                             <td>{{ $application->project->title }}</td>
                             <td>{{ $application->created_at->format('d-m-Y H:i') }}</td>
+                            <td>
+                                @if($application->status === 'pending')
+                                    <form action="{{ route('applications.accept', $application->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-success btn-sm mb-1">Accepteer</button>
+                                    </form>
+                                    <form action="{{ route('applications.reject', $application->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-danger btn-sm mb-1">Weiger</button>
+                                    </form>
+                                @elseif($application->status === 'accepted')
+                                    <span class="badge bg-success">Geaccepteerd</span>
+                                @else
+                                    <span class="badge bg-danger">Geweigerd</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>

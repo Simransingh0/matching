@@ -20,10 +20,10 @@
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index')">
                         {{ __('Projects') }}
                     </x-nav-link>
-                    @if(auth()->user()?->role === 'Admin')
                     <x-nav-link :href="route('profiles.index')" :active="request()->routeIs('profiles.index')">
                         {{ __('Profiel') }}
                     </x-nav-link>
+                    @if(auth()->user()?->role === 'Admin')
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('User') }}
                     </x-nav-link>

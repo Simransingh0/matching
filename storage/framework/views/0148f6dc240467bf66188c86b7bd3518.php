@@ -5,16 +5,22 @@
         <!-- Header -->
         <div class="text-center mb-4">
             <h1 class="display-5 fw-bold text-primary mb-2">Developer Profielen</h1>
-            <p class="text-muted">Beheer alle developer profielen en hun skills</p>
+            <?php if(auth()->user()?->role === 'Admin'): ?>
+                <p class="text-muted">Beheer alle developer profielen en hun skills</p>
+            <?php else: ?>
+                <p class="text-muted">Bekijk alle developer profielen en hun skills</p>
+            <?php endif; ?>
             <hr class="w-25 mx-auto border-2 border-primary rounded">
         </div>
 
         <div class="card shadow-lg border-0 rounded-4 bg-white p-4 p-md-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h5 fw-bold text-dark">Alle Profielen</h2>
+                <?php if(auth()->user()?->role === 'Admin'): ?>
                 <a href="<?php echo e(route('profiles.create')); ?>" class="btn btn-success fw-bold">
                     <i class="bi bi-plus-circle"></i> Nieuw Profiel
                 </a>
+                <?php endif; ?>
             </div>
 
             <div class="table-responsive">
@@ -26,7 +32,9 @@
                             <th>Skills</th>
                             <th>Experience</th>
                             <th>Availability</th>
+                            <?php if(auth()->user()?->role === 'Admin'): ?>
                             <th>Acties</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +52,7 @@
                                 </td>
                                 <td><?php echo e($profile->experience); ?></td>
                                 <td><?php echo e($profile->availability); ?></td>
+                                <?php if(auth()->user()?->role === 'Admin'): ?>
                                 <td>
                                     <a href="<?php echo e(route('profiles.edit', $profile->id)); ?>" class="btn btn-warning btn-sm me-1 mb-1">
                                         <i class="bi bi-pencil-square"></i>
@@ -56,6 +65,7 @@
                                         </button>
                                     </form>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>

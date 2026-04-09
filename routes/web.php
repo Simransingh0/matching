@@ -9,44 +9,62 @@ use App\Http\Controllers\ApplicationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\IsAdmin;
 
+// -------------------------------------
+// Public Routes
+// -------------------------------------
+Route::get('/', fn() => view('welcome'))->name('home');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// -------------------------------------
+// Authenticated User Routes
+// -------------------------------------
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [ApplicationController::class, 'dashboard'])->name('dashboard');
+    Route::post('/applications/{application}/cancel', [App\Http\Controllers\ApplicationController::class, 'cancel'])->name('applications.cancel');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+    // Profile management
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
 
-Route::middleware(['auth'])->group(function () {
+    //Profielen voor skills
+    Route::resource('profiles', AdminProfileController::class);
+
+    // Projects
     Route::resource('projects', ProjectController::class);
     Route::get('projects/{project}/matches', [ProjectController::class, 'matches'])->name('projects.matches');
+
+    // Applications
+    Route::prefix('projects/{project}')->group(function () {
+        Route::post('/apply', [ApplicationController::class, 'store'])->name('projects.apply');
+        Route::delete('/unapply', [ApplicationController::class, 'destroy'])->name('projects.unapply');
+    });
 });
 
+// -------------------------------------
+// Admin Routes
+// -------------------------------------
 Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () {
-    Route::resource('profiles', AdminProfileController::class);
-    Route::resource('users', AdminUserController::class);
+
+    // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    // Users & Profiles
+    Route::resource('users', AdminUserController::class);
+    
+
+    // Projects (admin view)
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('admin.projects.show');
-});
 
-Route::post('/projects/{project}/apply', [ApplicationController::class, 'store'])
-    ->name('projects.apply')
-    ->middleware('auth');
-
-Route::delete('/projects/{project}/unapply', [ApplicationController::class, 'destroy'])
-    ->name('projects.unapply')
-    ->middleware('auth');
-
-Route::middleware(['auth', IsAdmin::class])->group(function () {
-    Route::get('/admin/applications', [ApplicationController::class, 'index'])
-        ->name('admin.applications.index');
+    // Applications management
+    Route::prefix('applications')->group(function () {
+        Route::get('/', [ApplicationController::class, 'index'])->name('admin.applications.index');
+        Route::post('/{application}/accept', [ApplicationController::class, 'accept'])->name('applications.accept');
+        Route::post('/{application}/reject', [ApplicationController::class, 'reject'])->name('applications.reject');
+    });
 });
 
 require __DIR__.'/auth.php';
