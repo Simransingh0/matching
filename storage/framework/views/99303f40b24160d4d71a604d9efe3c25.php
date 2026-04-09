@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
     <div class="col-md-8 col-lg-6">
