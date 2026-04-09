@@ -12,18 +12,25 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    @if(auth()->user()?->role === 'Admin')
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @endif
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index')">
                         {{ __('Projects') }}
                     </x-nav-link>
+                    @if(auth()->user()?->role === 'Admin')
                     <x-nav-link :href="route('profiles.index')" :active="request()->routeIs('profiles.index')">
                         {{ __('Profiel') }}
                     </x-nav-link>
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('User') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.index')">
+                        {{ __('Applications') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 

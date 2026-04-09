@@ -13,7 +13,7 @@
         <!-- Card -->
         <div class="card shadow-lg border-0 rounded-4 bg-white p-4 p-md-5">
             @if($matchedUsers->isEmpty())
-                <p class="text-center text-muted fw-bold">Geen matches gevonden 😢</p>
+                <p class="text-center text-muted fw-bold">Geen matches gevonden</p>
             @else
                 <ul class="list-group">
                     @foreach($matchedUsers as $user)
@@ -25,12 +25,16 @@
                             <div>
                                 <strong>{{ $user->name }}</strong>
                                 <p class="mb-0 small text-muted">{{ implode(', ', $userSkills) }}</p>
+                                <p>{{ $user->name }} - Match: {{ round($user->matchPercentage) }}%</p>
+                                <h1>Test</h1>
                             </div>
                             <span class="badge bg-success rounded-pill">
                                 {{ count($commonSkills) }} match{{ count($commonSkills) > 1 ? 'es' : '' }}
                             </span>
+                            
                         </li>
                     @endforeach
+                    
                 </ul>
             @endif
 

@@ -1,10 +1,9 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container py-5">
     <h1 class="display-5 fw-bold mb-4"><?php echo e($project->title); ?></h1>
 
     <h3 class="h5 mb-3 text-primary">Matching Developers</h3>
+    <a class="btn btn-primary m-1" href="/projects"><?php echo e(__('Terug naar Projecten')); ?></a>
     <div class="row">
         <?php $__empty_1 = true; $__currentLoopData = $matches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $profile): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <div class="col-md-4 mb-3">
@@ -12,6 +11,10 @@
                     <h5><?php echo e($profile->user->name); ?></h5>
                     <p><strong>Experience:</strong> <?php echo e($profile->experience); ?></p>
                     <p><strong>Availability:</strong> <?php echo e($profile->availability); ?></p>
+                    <p>Match in procenten: <?php echo e(round($profile->matchPercentage)); ?>%</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-blue-500 h-4" style="width: <?php echo e($profile->matchPercentage ?? 0); ?>%"></div>
+                    </div>
                     <p>
                         <?php
                             $skills = is_array($profile->skills) ? $profile->skills : json_decode($profile->skills, true) ?? [];

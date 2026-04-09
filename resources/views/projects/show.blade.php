@@ -5,6 +5,7 @@
     <h1 class="display-5 fw-bold mb-4">{{ $project->title }}</h1>
 
     <h3 class="h5 mb-3 text-primary">Matching Developers</h3>
+    <a class="btn btn-primary m-1" href="/projects">{{ __('Terug naar Projecten') }}</a>
     <div class="row">
         @forelse($matches as $profile)
             <div class="col-md-4 mb-3">
@@ -12,6 +13,10 @@
                     <h5>{{ $profile->user->name }}</h5>
                     <p><strong>Experience:</strong> {{ $profile->experience }}</p>
                     <p><strong>Availability:</strong> {{ $profile->availability }}</p>
+                    <p>Match in procenten: {{ round($profile->matchPercentage) }}%</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-blue-500 h-4" style="width: {{ $profile->matchPercentage ?? 0 }}%"></div>
+                    </div>
                     <p>
                         @php
                             $skills = is_array($profile->skills) ? $profile->skills : json_decode($profile->skills, true) ?? [];

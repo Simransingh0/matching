@@ -13,19 +13,25 @@ class ProjectController extends Controller
 
     public function matches(Project $project)
     {
-        // Decode skills van het project
-        $projectSkills = json_decode($project->required_skills, true);
-        if (!is_array($projectSkills)) $projectSkills = [];
+        // Decode skills van het project en maak lowercase
+        $projectSkills = json_decode($project->required_skills, true) ?? [];
+        $projectSkillsLower = array_map('strtolower', $projectSkills);
 
         // Alle users laden
         $users = \App\Models\User::all();
 
-        // Filter users die matching skills hebben
-        $matchedUsers = $users->filter(function($user) use ($projectSkills) {
-            $userSkills = json_decode($user->skills, true);
-            if (!is_array($userSkills)) $userSkills = [];
-            // Return true als minstens 1 skill matcht
-            return count(array_intersect($projectSkills, $userSkills)) > 0;
+        // Filter users die matching skills hebben en bereken percentage
+        $matchedUsers = $users->map(function($user) use ($projectSkillsLower) {
+            $userSkills = json_decode($user->skills, true) ?? [];
+            $userSkillsLower = array_map('strtolower', $userSkills);
+
+            $matchingSkills = array_intersect($projectSkillsLower, $userSkillsLower);
+            $matchPercentage = count($matchingSkills) / max(count($projectSkillsLower), 1) * 100;
+
+            $user->matchPercentage = $matchPercentage; // voeg property toe voor view
+            return $user;
+        })->filter(function($user) {
+            return $user->matchPercentage > 0; // alleen users met matching skills
         });
 
         return view('projects.matches', compact('project', 'matchedUsers', 'projectSkills'));
@@ -71,24 +77,49 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
+    public function show1(Project $project)
+    {
+        return view('admin.project.show', compact('project'));
+    }
+    
     public function show(Project $project)
     {
-        // Project skills als array
+       // Decode project skills naar array
         $requiredSkills = json_decode($project->required_skills, true) ?? [];
 
-        // Alle profiles ophalen
+        // Alle profiles ophalen met bijbehorende user
         $profiles = Profile::with('user')->get();
 
-        // Filter op skills
-        $matches = $profiles->filter(function($profile) use ($requiredSkills) {
-            // Zorg dat skills een array is
+        // Filter en bereken match percentage
+        $matches = $profiles->map(function($profile) use ($requiredSkills) {
+            // Zorg dat profiel skills een array is
             $profileSkills = is_array($profile->skills) ? $profile->skills : json_decode($profile->skills, true) ?? [];
 
-            // Minstens 1 skill match
-            return count(array_intersect($profileSkills, $requiredSkills)) > 0;
+            // Hoofdletter-ongevoelige vergelijking
+            $matchingSkills = array_intersect(
+                array_map('strtolower', $profileSkills),
+                array_map('strtolower', $requiredSkills)
+            );
+
+            // Match percentage
+            $matchPercentage = count($requiredSkills) > 0
+                ? (count($matchingSkills) / count($requiredSkills)) * 100
+                : 0;
+
+            // Voeg matchPercentage en matchingSkills toe aan het profile object
+            $profile->matchPercentage = round($matchPercentage, 2); // afgerond op 2 decimalen
+            $profile->matchingSkills = $matchingSkills;
+
+            return $profile;
         });
 
-        return view('projects.show', compact('project', 'matches'));
+        // Alleen profiles met minstens 1 match tonen
+        $matches = $matches->filter(fn($profile) => $profile->matchPercentage > 0);
+
+        // Sorteer op matchPercentage (hoog naar laag)
+        $matches = $matches->sortByDesc('matchPercentage');
+
+        return view('projects.show', compact('project', 'matches', 'requiredSkills'));
     }
 
     /**
